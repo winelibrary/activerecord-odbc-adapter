@@ -1016,7 +1016,7 @@ begin
             odbcNullable = col[10] # SQLColumns: NULLABLE
             # isNotNullable == true  => *definitely not* nullable
             #               == false => *may* be nullable
-            isNotNullable = (odbcIsNullable.match('NO') != nil)
+            isNotNullable = (!odbcIsNullable || odbcIsNullable.match('NO') != nil)
             # Assume column is nullable if odbcNullable == SQL_NULLABLE_UNKNOWN
             colNullable = !(isNotNullable || odbcNullable == SQL_NO_NULLS)
             
@@ -1569,7 +1569,7 @@ begin
             symbl = :mysql
           elsif dbmsName =~ /oracle/i
             symbl = :oracle 
-          elsif dbmsName =~ /postgres/i
+          elsif dbmsName =~ /postgres/i || dbmsName =~ /vertica/i
             symbl = :postgresql
           elsif dbmsName =~ /progress/i
             # ODBC connections to Progress >= v9 are assumed to be to
