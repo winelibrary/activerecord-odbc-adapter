@@ -658,6 +658,7 @@ begin
           @logger.unknown("args=[#{name}]") if @@trace        
           name = name.to_s if name.class == Symbol                
           idQuoteChar = @dsInfo.info[ODBC::SQL_IDENTIFIER_QUOTE_CHAR]
+
           return name if !idQuoteChar || ((idQuoteChar = idQuoteChar.strip).length == 0)
           idQuoteChar = idQuoteChar[0]
           
@@ -763,11 +764,11 @@ begin
         
         # Returns an array of record hashes with the column names as keys and
         # column values as values.
-        def select_all(sql, name = nil)
+        def select_all(arel, name=nil, binds = nil)
           @logger.unknown("ODBCAdapter#select_all>") if @@trace
           @logger.unknown("args=[#{sql}|#{name}]") if @@trace
           retVal = []
-          hResult = select(sql, name)
+          hResult = select(to_sql(arel), name)
           rRows = hResult[:rows]
           rColDescs = hResult[:column_descriptors]
           
@@ -1177,6 +1178,11 @@ begin
         rescue Exception => e
           @logger.unknown("exception=#{e}") if @@trace
           raise ActiveRecordError, e.message
+        end
+
+        def primary_key(table)
+          # SELECT constraint_name, FROM primary_keys where table_name = #{table_name};
+          nil # for now because we only want to query these tables
         end
         
         # Creates a new table. See SchemaStatements#create_table.
