@@ -765,10 +765,11 @@ begin
         # Returns an array of record hashes with the column names as keys and
         # column values as values.
         def select_all(arel, name=nil, binds = nil)
+          sql = to_sql(arel)
           @logger.unknown("ODBCAdapter#select_all>") if @@trace
           @logger.unknown("args=[#{sql}|#{name}]") if @@trace
           retVal = []
-          hResult = select(to_sql(arel), name)
+          hResult = select(sql, name)
           rRows = hResult[:rows]
           rColDescs = hResult[:column_descriptors]
           
