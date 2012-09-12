@@ -1,3 +1,6 @@
+September 12, 2012, V2.1
+  * Changes for Rails / ActiveRecord 3.1 and 3.2
+
 April 23, 2008, V2.0:
   * Changes for Rails 2.0.x / ActiveRecord 2.0.x
   * Added support for DSN-less connections

@@ -1,3 +1,10 @@
+2012-09-12 19:12  source
+
+	* Updated version number to 2.1
+	* Added support for Rails / ActiveRecord 3.1.x and 3.2.x
+	* Added support for ARel
+	* Added support for visitor model being maintained by the connection
+
 2008-04-22 16:55  source
 
 	* Added support for DSN-less connections

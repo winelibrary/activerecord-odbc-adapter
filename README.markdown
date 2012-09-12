@@ -5,6 +5,10 @@
 
 # Status
 
+**12-Sep-2012**
+
+Added support for Rails / ActiveRecord 3.1.x and 3.2
+
 **22-Nov-2008**
 
 Added new install information

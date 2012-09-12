@@ -25,6 +25,7 @@
 #
 
 require 'active_record/connection_adapters/abstract_adapter'
+require 'arel/visitors/bind_visitor'
 
 begin
   require_library_or_gem 'odbc' unless self.class.const_defined?(:ODBC)
@@ -234,7 +235,7 @@ begin
       # 
       
       class ODBCAdapter < AbstractAdapter
-        
+
         #-------------------------------------------------------------------
         # DbmsInfo holds DBMS-dependent information which cannot be derived 
         # satisfactorily through ODBC
@@ -456,7 +457,11 @@ begin
           end
           
         end # class DSInfo
-        
+
+        class BindSubstitution < Arel::Visitors::ToSql # :nodoc:
+          include Arel::Visitors::BindVisitor
+        end
+
         #---------------------------------------------------------------------
         
         # ODBC constants missing from Christian Werner's Ruby ODBC driver
@@ -507,8 +512,11 @@ begin
           # Caches SQLGetTypeInfo output
           @typeInfo = nil 
           # Caches mapping of Rails abstract data types to DBMS native types.
-          @abstract2NativeTypeMap = nil 
-          
+          @abstract2NativeTypeMap = nil
+
+
+          @visitor = BindSubstitution.new self
+
           # Set @dbmsName and @dbmsMajorVer from SQLGetInfo output.
           # Each ODBCAdapter instance is associated with only one connection,
           # so using ODBCAdapter instance variables for DBMS name and version
@@ -765,7 +773,7 @@ begin
         # Returns an array of record hashes with the column names as keys and
         # column values as values.
         def select_all(arel, name=nil, binds = nil)
-          sql = to_sql(arel)
+          sql = to_sql(arel, binds)
           @logger.unknown("ODBCAdapter#select_all>") if @@trace
           @logger.unknown("args=[#{sql}|#{name}]") if @@trace
           retVal = []
