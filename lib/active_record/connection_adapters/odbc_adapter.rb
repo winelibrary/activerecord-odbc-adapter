@@ -335,7 +335,7 @@ begin
                 :supports_migrations => true,
                 :supports_schema_names => false,
                 :supports_count_distinct => true,
-                # boolean_col_surrogate not necessary.
+                # boolean_col_surrogate not necessary. 
                 # PostgreSQL's BOOL data type is mapped to ODBC::SQL_BIT/:boolean.
                 :boolean_col_surrogate => nil
               }
@@ -906,8 +906,8 @@ begin
         end
         
         # Returns the ID of the last inserted row.
-        def insert(sql, name = nil, pk = nil, id_value = nil, 
-            sequence_name = nil)
+        def insert(sql, name = nil, pk = nil, id_value = nil, sequence_name = nil)
+          sql = sql.to_sql if sql.is_a?(Arel::InsertManager)
           @logger.unknown("ODBCAdapter#insert>") if @@trace
           @logger.unknown("args=[#{sql}|#{name}|#{pk}|#{id_value}|#{sequence_name}]") if @@trace
           insert_sql(sql, name, pk, id_value, sequence_name)
