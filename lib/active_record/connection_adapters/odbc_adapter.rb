@@ -328,6 +328,18 @@ begin
                 :boolean_col_surrogate => "NUMBER(1)"
               }
             },
+            :vertica => {
+              :any_version => {
+                :primary_key => "SERIAL PRIMARY KEY",
+                :has_autoincrement_col => true,
+                :supports_migrations => true,
+                :supports_schema_names => false,
+                :supports_count_distinct => true,
+                # boolean_col_surrogate not necessary.
+                # PostgreSQL's BOOL data type is mapped to ODBC::SQL_BIT/:boolean.
+                :boolean_col_surrogate => nil
+              }
+            },
             :postgresql => {
               :any_version => {
                 :primary_key => "SERIAL PRIMARY KEY",
@@ -1071,18 +1083,18 @@ begin
         def indexes(table_name, name = nil)
           @logger.unknown("ODBCAdapter#indexes>") if @@trace
           @logger.unknown("args=[#{table_name}|#{name}]") if @@trace
-          
+
           indexes = []
           indexCols = indexName = isUnique = nil
-          
+
           stmt = @connection.indexes(dbmsIdentCase(table_name.to_s))
           rs = stmt.fetch_all || []
           rs.each_index do |iRow|
             row = rs[iRow]
-            
+
             # Skip table statistics
             next if row[6] == 0 # SQLStatistics: TYPE
-            
+
             if (row[7] == 1) # SQLStatistics: ORDINAL_POSITION
               # Start of column descriptor block for next index
               indexCols = Array.new
@@ -1091,7 +1103,7 @@ begin
             end
 
             indexCols << activeRecIdentCase(row[8]) # SQLStatistics: COLUMN_NAME
-            
+
             lastRow = (iRow == rs.length - 1)
             if lastRow
               lastColOfIndex = true
@@ -1102,10 +1114,10 @@ begin
 
             if lastColOfIndex
               indexes << IndexDefinition.new(table_name, 
-                activeRecIdentCase(indexName), isUnique, indexCols)
+                                             activeRecIdentCase(indexName), isUnique, indexCols)
             end
           end
-          indexes
+          return indexes
         rescue Exception => e
           @logger.unknown("exception=#{e}") if @@trace
           raise ActiveRecordError, e.message
@@ -1584,8 +1596,10 @@ begin
             symbl = :mysql
           elsif dbmsName =~ /oracle/i
             symbl = :oracle 
-          elsif dbmsName =~ /postgres/i || dbmsName =~ /vertica/i
+          elsif dbmsName =~ /postgres/i
             symbl = :postgresql
+          elsif dbmsName =~ /vertica/i
+            symbl = :vertica
           elsif dbmsName =~ /progress/i
             # ODBC connections to Progress >= v9 are assumed to be to
             # the SQL-92 engine. Connections to Progress <= v8 are
