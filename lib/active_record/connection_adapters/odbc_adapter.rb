@@ -810,7 +810,8 @@ begin
         
         # Returns a record hash with the column names as keys and column values
         # as values.
-        def select_one(sql, name = nil)
+        def select_one(arel, name=nil, binds = nil)
+          sql = to_sql(arel, binds)
           @logger.unknown("ODBCAdapter#select_one>") if @@trace
           @logger.unknown("args=[#{sql}|#{name}]") if @@trace
           retVal = nil
