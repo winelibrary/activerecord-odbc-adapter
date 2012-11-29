@@ -1617,6 +1617,9 @@ begin
           elsif dbmsName =~ /visualfoxpro/i
             # Try to access Visual Fox Pro database as a PostgreSQL database, works for simple queries.
             symbl = :postgresql
+          elsif dbmsName =~ /dharma/i
+            # Hacking in support for dharma - sybase should also work...  For either to work Schema information much be enabled.
+            symbl = :microsoftsqlserver
           else
             raise ActiveRecord::ActiveRecordError, "ODBCAdapter: Unsupported database (#{dbmsName})"
           end
