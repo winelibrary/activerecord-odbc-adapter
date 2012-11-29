@@ -1757,7 +1757,7 @@ begin
           when ODBC::Date
             Date.new(value.year, value.month, value.day)
           else
-            value
+            value.try(:strip)
           end
         rescue
           # Handle pre-epoch dates
