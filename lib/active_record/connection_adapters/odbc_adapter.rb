@@ -395,7 +395,8 @@ begin
                 :supports_migrations => true,
                 :supports_schema_names => true,
                 :supports_count_distinct => true,
-                :boolean_col_surrogate => "TINYINT"                                           }
+                :boolean_col_surrogate => "TINYINT"
+              }
             },
             :virtuoso => {
               :any_version => {
@@ -1618,8 +1619,8 @@ begin
             # Try to access Visual Fox Pro database as a PostgreSQL database, works for simple queries.
             symbl = :postgresql
           elsif dbmsName =~ /dharma/i
-            # Hacking in support for dharma - sybase should also work...  For either to work Schema information much be enabled.
-            symbl = :microsoftsqlserver
+            # Hacking in support for dharma - Schema information must be enabled in the unixODBC ini config
+            symbl = :progress
           else
             raise ActiveRecord::ActiveRecordError, "ODBCAdapter: Unsupported database (#{dbmsName})"
           end
@@ -1757,7 +1758,7 @@ begin
           when ODBC::Date
             Date.new(value.year, value.month, value.day)
           else
-            value.try(:strip)
+            value.is_a?(String) ? value.try(:strip) : value
           end
         rescue
           # Handle pre-epoch dates
